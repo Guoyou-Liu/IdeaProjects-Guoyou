@@ -47,7 +47,7 @@ public class AppiumServerGui {
         process.waitFor();
     }
 
-    public static void closeTerminalWindows() throws IOException, InterruptedException {
+    public static void closeTerminalWindows() {
         command = new String[]{
                 "pkill", "-f", "Terminal"
         };
