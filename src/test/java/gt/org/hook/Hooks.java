@@ -1,4 +1,4 @@
-package gt.org.hooks;
+package gt.org.hook;
 
 import gt.org.runner.TestRunner;
 import gt.org.utils.DriverManager;
@@ -16,18 +16,22 @@ public class Hooks {
         this.driver = DriverManager.getDriver();
     }
 
-    @After
-    public void scenarioFailed(@NotNull Scenario scenario)  {
+    @AfterStep
+    public void ScreenshotOnScenarioFailed(@NotNull Scenario scenario)  {
         if (scenario.isFailed()) {
             byte[] screenshot = TestRunner.takeScreenshot(driver);
 
             scenario.attach(screenshot, "image/png", "Failed Screenshot");
 
             TestRunner.saveScreenshotToFile(screenshot, "target/screenshots/failed/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))  + "-" + scenario.getName() + ".png");
-            if (driver != null){
-                DriverManager.restartApp();
-            }
         }
     }
 
+    @After
+    public void restartAppOnScenarioFailed(@NotNull Scenario scenario){
+        if (scenario.isFailed()){
+            System.out.println("Scenario failed, restarting the app...\n");
+            DriverManager.restartApp();
+        }
+    }
 }

@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @CucumberOptions(
         features = {"src/test/resources/features"},
-        glue = {"gt.org.steps","gt.org.hooks"},
+        glue = {"gt.org.steps","gt.org.hook"},
         plugin = {"pretty",
                 "html:target/reports/index.html",
                 "json:target/reports/cucumber-report.json",
@@ -41,7 +41,6 @@ public class TestRunner extends AbstractTestNGCucumberTests {
                         e.printStackTrace();
                 }
         }
-
         @BeforeSuite
         public void setUp() throws IOException, InterruptedException {
                 if (AppiumServerGui.isAppiumServicePortOccupied("4723")){
@@ -54,6 +53,7 @@ public class TestRunner extends AbstractTestNGCucumberTests {
         public void tearDown() throws IOException, InterruptedException {
                 ReportGenerator reportGenerator = new ReportGenerator();
                 reportGenerator.generateReport();
+                System.out.println("All Scenario execution completed, quit the app...\n");
                 DriverManager.quitDriver();
                 if (AppiumServerGui.isAppiumServicePortOccupied("4723")){
                         AppiumServerGui.closeAppiumService("4723");

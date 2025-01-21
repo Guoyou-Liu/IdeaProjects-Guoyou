@@ -28,15 +28,13 @@ public class ReportGenerator{
         configuration.setBuildNumber(buildNumber);
         String platform = driver.getCapabilities().getCapability("platformName").toString();
         String version = driver.getCapabilities().getCapability("platformVersion").toString();
-        String device = "";
-        if (Objects.equals(System.getProperty("platform"), "Android")){
-            device = driver.getCapabilities().getCapability("avd").toString();
-        }if (Objects.equals(System.getProperty("platform"), "iOS")){
-            device = driver.getCapabilities().getCapability("deviceName").toString();
-        }
         configuration.addClassifications("Platform",platform);
         configuration.addClassifications("Version",version);
-        configuration.addClassifications("deviceName",device);
+        if (Objects.equals(System.getProperty("platform"), "Android")){
+            configuration.addClassifications("deviceName",driver.getCapabilities().getCapability("avd").toString());
+        }if (Objects.equals(System.getProperty("platform"), "iOS")){
+            configuration.addClassifications("deviceName",driver.getCapabilities().getCapability("deviceName").toString());
+        }
         configuration.setSortingMethod(SortingMethod.NATURAL);
         configuration.addPresentationModes(PresentationMode.EXPAND_ALL_STEPS);
         ReportBuilder reportBuilder = new ReportBuilder(jsonFiles,configuration);
