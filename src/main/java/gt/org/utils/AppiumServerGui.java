@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 
 public class AppiumServerGui {
 
-    private static Process process;
-    private static String[] command;
+    private Process process;
+    private String[] command;
 
-    public static void startAppiumService(String proxy) throws IOException, InterruptedException {
+    public void startAppiumService(String proxy) throws IOException, InterruptedException {
         String appiumCommand = String.format("appium --address 127.0.0.1 --port %s --allow-cors --base-path /wd/hub", proxy);
         command = new String[]{
                 "osascript", "-e",
@@ -19,7 +19,7 @@ public class AppiumServerGui {
         Thread.sleep(8000l);
     }
 
-    public static boolean isAppiumServicePortOccupied(String port) {
+    public boolean isAppiumServicePortOccupied(String port) {
         String command = String.format("lsof -t -i:%s", port);
         StringBuilder result = new StringBuilder();
 
@@ -38,7 +38,7 @@ public class AppiumServerGui {
         return result.length() > 0;
     }
 
-    public static void closeAppiumService(String port) throws IOException, InterruptedException {
+    public void closeAppiumService(String port) throws IOException, InterruptedException {
         String closeCommand = String.format("kill $(lsof -t -i:%s)", port);
         command = new String[]{
                 "osascript", "-e",
@@ -47,7 +47,7 @@ public class AppiumServerGui {
         process.waitFor();
     }
 
-    public static void closeTerminalWindows() {
+    public void closeTerminalWindows() {
         command = new String[]{
                 "pkill", "-f", "Terminal"
         };

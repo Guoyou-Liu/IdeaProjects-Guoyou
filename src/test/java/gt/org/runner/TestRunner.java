@@ -1,10 +1,14 @@
 package gt.org.runner;
 import gt.org.reports.ReportGenerator;
+import gt.org.utils.AppiumServer;
 import gt.org.utils.AppiumServerGui;
 import gt.org.utils.DriverManager;
 import io.appium.java_client.AppiumDriver;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -15,6 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+@Setter
+@Getter
 @CucumberOptions(
         features = {"src/test/resources/features"},
         glue = {"gt.org.steps","gt.org.hook"},
@@ -27,6 +33,7 @@ import java.io.IOException;
 )
 
 public class TestRunner extends AbstractTestNGCucumberTests {
+        private AppiumServer appiumServer = new AppiumServer();
 
         public static byte @NotNull [] takeScreenshot(AppiumDriver driver) {
                 return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
@@ -42,22 +49,27 @@ public class TestRunner extends AbstractTestNGCucumberTests {
                 }
         }
         @BeforeSuite
-        public void setUp() throws IOException, InterruptedException {
-                if (AppiumServerGui.isAppiumServicePortOccupied("4723")){
-                        AppiumServerGui.closeAppiumService("4723");
+        public void startAppiumServer() {
+
+                if (appiumServer.isAppiumServicePortOccupancy(4723)){
+                        System.out.println("Appium Server Port occupied, Close port...");
+                        appiumServer.stopAppiumService();
                 }
-                AppiumServerGui.startAppiumService("4723");
+                System.out.println("Appium Server Port start ...");
+                appiumServer.startAppiumService(4723);
+
                 DriverManager.getDriver();
         }
         @AfterSuite
-        public void tearDown() throws IOException, InterruptedException {
+        public void generateReportAndTearDown() {
                 ReportGenerator reportGenerator = new ReportGenerator();
                 reportGenerator.generateReport();
                 System.out.println("All Scenario execution completed, quit the app...\n");
                 DriverManager.quitDriver();
-                if (AppiumServerGui.isAppiumServicePortOccupied("4723")){
-                        AppiumServerGui.closeAppiumService("4723");
-                        AppiumServerGui.closeTerminalWindows();
+
+                if (appiumServer.isAppiumServicePortOccupancy(4723)){
+                        System.out.println("Appium Server stopping...");
+                        appiumServer.stopAppiumService();
                 }
         }
 
